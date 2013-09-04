@@ -2,10 +2,81 @@
 <html>
 	<head>
 		<title>September is for shipping</title>
+		<style type="text/css">
+			body, html {
+				text-align: center;
+				height: 100%;
+				min-height: 100%;
+				padding: 0;
+				margin: 0;
+				position: relative;
+			}
+			#owls {
+				position: absolute;
+				top: 200px;
+				left: 50%;
+				margin-left: -262px;
+				background: url(./september-is-for-shipping.png) no-repeat center center;
+				width: 523px;
+				height: 425px;
+			}
+			.eyeball {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				background-color: #BFBFBF;
+			}
+		</style>
 	</head>
 	<body>
-		<div style="text-align:center;margin-top: 200px">
-			<img alt="September is for shipping" src="./september-is-for-shipping.png" />
-		</div>
+		<div id="owls"></div>
+		<script src="./jquery.min.js?2.0.3"></script>
+		<script type="text/javascript">
+			function boundValue(value, radius) {
+				return Math.min(Math.max(value, -radius), radius);
+			}
+			function calculateHypotenuse(x, y) {
+				return Math.sqrt(x * x + y * y);
+			}
+			function moveEyeBall(event) {
+				var settings = event.data;
+				var offset = settings.mount.offset();
+				var mouseToImageX = event.pageX - offset.left;
+				var diffX = mouseToImageX - settings.centerX;
+				var mouseToEyeBallX = boundValue(diffX, settings.maxRadius);
+				var mouseToImageY = event.pageY - offset.top;
+				var diffY = mouseToImageY - settings.centerY;
+				var mouseToEyeBallY = boundValue(diffY, settings.maxRadius);
+				var distance = calculateHypotenuse(mouseToEyeBallX, mouseToEyeBallY);
+				var distanceProportion = settings.radius / distance;
+				var partialLength = Math.min(distance, settings.maxRadius) / settings.maxRadius;
+				var scale = distanceProportion * partialLength;
+				var eyeBallDistanceX = mouseToEyeBallX * scale;
+				var eyeBallDistanceY = mouseToEyeBallY * scale;
+				settings.eyeBall.css('left', eyeBallDistanceX + settings.centerX);
+				settings.eyeBall.css('top', eyeBallDistanceY + settings.centerY);
+			}
+			function EyeBall(image, centerX, centerY, radius) {
+				var eyeBall = $('<div/>')
+					.addClass('eyeball')
+					.css('left', centerX)
+					.css('top', centerY)
+					.appendTo(image);
+				var settings = {
+					centerX: centerX,
+					centerY: centerY,
+					radius: radius,
+					maxRadius: 200,
+					eyeBall: eyeBall,
+					mount: image
+				};
+				$('body').on('mousemove', settings, moveEyeBall);
+			}
+			var owls = $('#owls');
+			EyeBall(owls, 50, 75, 7);
+			EyeBall(owls, 118, 76, 7);
+			EyeBall(owls, 344, 84, 6);
+			EyeBall(owls, 403, 85, 6);
+		</script>
 	</body>
 </html>
